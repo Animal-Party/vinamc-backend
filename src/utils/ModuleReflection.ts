@@ -19,7 +19,6 @@ export default function ModuleReflection(
     const modules: Type<any>[] = [];
 
     try {
-        // Find all modules recursively
         findModules(modulePath, modules, logger);
 
         logger.log(`Discovered ${modules.length} modules`);
@@ -30,30 +29,23 @@ export default function ModuleReflection(
     }
 }
 
-/**
- * Recursively find modules in a directory structure
- */
 function findModules(
     dirPath: string,
     modules: Type<any>[],
     logger: ConsoleLogger
 ): void {
     try {
-        // Get all entries in the directory
         const entries = readdirSync(dirPath);
 
-        // First, check this directory for a module file
         const moduleFile = entries.find(file => file.match(/\.module\.(ts|js)$/i));
         if (moduleFile) {
             try {
                 const modulePath = join(dirPath, moduleFile);
                 const moduleExport = require(modulePath);
 
-                // Get the module class (could be default export or named export)
                 let moduleClass = moduleExport.default;
 
                 if (!moduleClass) {
-                    // Try to find a class among named exports
                     const exportedValues = Object.values(moduleExport);
                     moduleClass = exportedValues.find(value =>
                         typeof value === 'function' ||
@@ -72,7 +64,6 @@ function findModules(
             }
         }
 
-        // Then, recursively check all subdirectories
         entries.forEach(entry => {
             const entryPath = join(dirPath, entry);
 

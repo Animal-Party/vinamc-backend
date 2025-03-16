@@ -1,17 +1,20 @@
-import { Injectable, Logger, LoggerService, LogLevel } from '@nestjs/common';
+import { ConsoleLogger, Injectable, Logger, LoggerService, LogLevel } from '@nestjs/common';
 
 @Injectable()
 export class AppLoggerService {
   private contextLoggers: Map<string, LoggerService> = new Map();
-  private defaultLogger: Logger;
+  private defaultLogger: ConsoleLogger;
   
   constructor() {
-    this.defaultLogger = new Logger('Application');
+    this.defaultLogger = new ConsoleLogger('Application');
   }
 
   getLogger(context: string): LoggerService {
     if (!this.contextLoggers.has(context)) {
-      this.contextLoggers.set(context, new Logger(context));
+      this.contextLoggers.set(context, new ConsoleLogger({
+        context,
+        prefix: "VinaMC"
+      }));
     }
     return this.contextLoggers.get(context)!;
   }
