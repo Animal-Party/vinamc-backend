@@ -54,6 +54,14 @@ export class RequestLoggerMiddleware implements NestMiddleware {
                 return result;
             };
 
+            /// Remove headers that may expose sensitive information
+            res.header('X-Powered-By', "Animal-Party-Engine");
+            res.removeHeader("Access-Control-Allow-Origin");
+            res.removeHeader("Access-Control-Allow-Credentials");
+            res.removeHeader("Access-Control-Allow-Methods");
+            res.set("ETag", "Toi yeu em");
+
+
             next();
         } catch (error) {
             this.logger.error(`Error in RequestLogger middleware: ${error instanceof Error ? error.message : String(error)}`);
