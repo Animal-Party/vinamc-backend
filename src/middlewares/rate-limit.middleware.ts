@@ -20,7 +20,7 @@ export class RateLimitMiddleware implements NestMiddleware {
     private readonly windowMs: number;
 
     constructor(
-        @Inject(AppLoggerService) private readonly logger: AppLoggerService,
+        @Inject(AppLoggerService) private readonly loggerService: AppLoggerService,
         @Inject(RATE_LIMIT_OPTIONS) private readonly options: RateLimitOptions
     ) {
         this.limit = options.limit;
@@ -44,7 +44,7 @@ export class RateLimitMiddleware implements NestMiddleware {
             this.rateCounter.set(ip, requestLog);
 
             if (requestLog.count > this.limit) {
-                this.logger.getLogger('RateLimit').warn(`Rate limit exceeded for IP ${ip}`);
+                this.loggerService.getLogger('RateLimit').warn(`Rate limit exceeded for IP ${ip}`);
                 throw new HttpException('Too many requests, please try again later.', HttpStatus.TOO_MANY_REQUESTS);
             }
         }
