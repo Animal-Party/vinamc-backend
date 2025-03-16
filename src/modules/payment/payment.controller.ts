@@ -7,6 +7,10 @@ export default class PaymentController {
     async createTransaction() {
 
     }
+    @Get()
+    test() {
+        return "concac";
+    }
 
     @Get("get-payment/:id")
     async getTransaction() {
