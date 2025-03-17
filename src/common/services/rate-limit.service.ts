@@ -1,7 +1,11 @@
-import { Injectable, Inject } from "@nestjs/common";
-import { NextFunction, Request, Response } from "express";
-import { AppLoggerService } from "src/common/services/app-logger.service";
-import { RateLimitOptions, RATE_LIMIT_OPTIONS, RateLimitMiddleware } from "../middlewares/rate-limit.middleware";
+import { Injectable, Inject } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
+import { AppLoggerService } from 'src/common/services/app-logger.service';
+import {
+    RateLimitOptions,
+    RATE_LIMIT_OPTIONS,
+    RateLimitMiddleware,
+} from '../middlewares/rate-limit.middleware';
 
 @Injectable()
 export class RateLimitService {
@@ -9,7 +13,7 @@ export class RateLimitService {
 
     constructor(
         private readonly logger: AppLoggerService,
-        @Inject(RATE_LIMIT_OPTIONS) readonly options: RateLimitOptions
+        @Inject(RATE_LIMIT_OPTIONS) readonly options: RateLimitOptions,
     ) {
         this.middleware = new RateLimitMiddleware(logger, options);
     }

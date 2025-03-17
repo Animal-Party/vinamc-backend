@@ -1,7 +1,10 @@
-import { Module } from "@nestjs/common";
-import { RateLimitMiddleware, RATE_LIMIT_OPTIONS } from "../middlewares/rate-limit.middleware";
-import { RateLimitService } from "../services/rate-limit.service";
-import { AppLoggerModule } from "./app-logger.module";
+import { Module } from '@nestjs/common';
+import {
+    RateLimitMiddleware,
+    RATE_LIMIT_OPTIONS,
+} from '../middlewares/rate-limit.middleware';
+import { RateLimitService } from '../services/rate-limit.service';
+import { AppLoggerModule } from './app-logger.module';
 
 @Module({
     imports: [AppLoggerModule],
@@ -19,7 +22,7 @@ import { AppLoggerModule } from "./app-logger.module";
         {
             provide: RATE_LIMIT_OPTIONS,
             useValue: { limit: 50, windowMs: 60000 },
-        }
+        },
     ],
 })
-export class RateLimitModule { }
+export class RateLimitModule {}

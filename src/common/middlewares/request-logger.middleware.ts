@@ -1,4 +1,11 @@
-import { Injectable, NestMiddleware, Logger, LoggerService, Optional, Inject } from '@nestjs/common';
+import {
+    Injectable,
+    NestMiddleware,
+    Logger,
+    LoggerService,
+    Optional,
+    Inject,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { RequestData, RequestLoggerOptions } from '../../types/logger';
@@ -21,7 +28,11 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     private readonly logger: LoggerService;
     private readonly metricsMap = new Map<string, number[]>();
 
-    constructor(@Optional() @Inject('REQUEST_LOGGER_OPTIONS') options?: RequestLoggerOptions) {
+    constructor(
+        @Optional()
+        @Inject('REQUEST_LOGGER_OPTIONS')
+        options?: RequestLoggerOptions,
+    ) {
         this.options = { ...defaultOptions, ...options };
         this.logger = options?.loggerService || new Logger('HTTP');
 
@@ -49,22 +60,27 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
                 this.logResponse(res, requestData, process.hrtime(startTime));
 
-                this.trackRequestMetrics(req.method, req.path, process.hrtime(startTime));
+                this.trackRequestMetrics(
+                    req.method,
+                    req.path,
+                    process.hrtime(startTime),
+                );
 
                 return result;
             };
 
             /// Remove headers that may expose sensitive information
-            res.header('X-Powered-By', "Animal-Party-Engine");
-            res.removeHeader("Access-Control-Allow-Origin");
-            res.removeHeader("Access-Control-Allow-Credentials");
-            res.removeHeader("Access-Control-Allow-Methods");
-            res.set("ETag", "Toi yeu em");
-
+            res.header('X-Powered-By', 'Animal-Party-Engine');
+            res.removeHeader('Access-Control-Allow-Origin');
+            res.removeHeader('Access-Control-Allow-Credentials');
+            res.removeHeader('Access-Control-Allow-Methods');
+            res.set('ETag', 'Toi yeu em');
 
             next();
         } catch (error) {
-            this.logger.error(`Error in RequestLogger middleware: ${error instanceof Error ? error.message : String(error)}`);
+            this.logger.error(
+                `Error in RequestLogger middleware: ${error instanceof Error ? error.message : String(error)}`,
+            );
             next();
         }
     }
@@ -72,11 +88,17 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     private shouldSkip(req: Request): boolean {
         const { excludePaths, excludePathRegex } = this.options;
 
-        if (excludePaths?.some(path => req.path.startsWith(path) || req.originalUrl.startsWith(path))) {
+        if (
+            excludePaths?.some(
+                (path) =>
+                    req.path.startsWith(path) ||
+                    req.originalUrl.startsWith(path),
+            )
+        ) {
             return true;
         }
 
-        if (excludePathRegex?.some(regex => regex.test(req.path))) {
+        if (excludePathRegex?.some((regex) => regex.test(req.path))) {
             return true;
         }
 
@@ -123,13 +145,15 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         }
 
         if (this.options.logBody && req.body) {
-            const bodyStr = typeof req.body === 'object'
-                ? JSON.stringify(this.maskSensitiveData(req.body))
-                : String(req.body);
+            const bodyStr =
+                typeof req.body === 'object'
+                    ? JSON.stringify(this.maskSensitiveData(req.body))
+                    : String(req.body);
 
-            requestData['body'] = bodyStr.length > (this.options.maxBodyLength || 1000)
-                ? `${bodyStr.substring(0, this.options.maxBodyLength)}... [truncated]`
-                : bodyStr;
+            requestData['body'] =
+                bodyStr.length > (this.options.maxBodyLength || 1000)
+                    ? `${bodyStr.substring(0, this.options.maxBodyLength)}... [truncated]`
+                    : bodyStr;
         }
 
         return requestData;
@@ -141,12 +165,18 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         const { sensitiveHeaders, sensitiveParams, maskText } = this.options;
         const maskedData = { ...data };
 
-        const sensitiveKeys = [...(sensitiveHeaders || []), ...(sensitiveParams || [])].map(key => key.toLowerCase());
+        const sensitiveKeys = [
+            ...(sensitiveHeaders || []),
+            ...(sensitiveParams || []),
+        ].map((key) => key.toLowerCase());
 
-        Object.keys(maskedData).forEach(key => {
+        Object.keys(maskedData).forEach((key) => {
             if (sensitiveKeys.includes(key.toLowerCase())) {
                 maskedData[key] = maskText || '[REDACTED]';
-            } else if (typeof maskedData[key] === 'object' && maskedData[key] !== null) {
+            } else if (
+                typeof maskedData[key] === 'object' &&
+                maskedData[key] !== null
+            ) {
                 maskedData[key] = this.maskSensitiveData(maskedData[key]);
             }
         });
@@ -157,11 +187,15 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     private logRequest(requestData: RequestData): void {
         const { requestId, method, originalUrl, ip, userAgent } = requestData;
 
-        let message = `[${requestId}] | ${method} ${originalUrl} - ${ip} - ${userAgent}`;
+        const message = `[${requestId}] | ${method} ${originalUrl} - ${ip} - ${userAgent}`;
         this.logger.log(message);
 
-        if ((this.options.logParams || this.options.logHeaders || this.options.logBody) &&
-            (requestData.params || requestData.headers || requestData.body)) {
+        if (
+            (this.options.logParams ||
+                this.options.logHeaders ||
+                this.options.logBody) &&
+            (requestData.params || requestData.headers || requestData.body)
+        ) {
             const logDetails = {
                 ...requestData,
                 requestId: requestId,
@@ -173,18 +207,31 @@ export class RequestLoggerMiddleware implements NestMiddleware {
             };
 
             if (typeof this.logger.debug === 'function') {
-                this.logger.debug(`[${requestId}] Request details:`, logDetails);
+                this.logger.debug(
+                    `[${requestId}] Request details:`,
+                    logDetails,
+                );
             } else {
-                this.logger.verbose?.(`[${requestId}] Request details:`, logDetails);
+                this.logger.verbose?.(
+                    `[${requestId}] Request details:`,
+                    logDetails,
+                );
             }
         }
     }
-    private logResponse(res: Response, requestData: RequestData, hrDuration: [number, number]): void {
+    private logResponse(
+        res: Response,
+        requestData: RequestData,
+        hrDuration: [number, number],
+    ): void {
         const { requestId, method, originalUrl } = requestData;
         const { statusCode } = res;
         const contentLength = res.get('content-length') || 0;
 
-        const durationMs = (hrDuration[0] * 1000 + hrDuration[1] / 1000000).toFixed(2);
+        const durationMs = (
+            hrDuration[0] * 1000 +
+            hrDuration[1] / 1000000
+        ).toFixed(2);
 
         const logMessage = `[${requestId}] ${method} ${originalUrl} ${statusCode} ${contentLength}B - ${durationMs}ms`;
 
@@ -197,7 +244,11 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         }
     }
 
-    private trackRequestMetrics(method: string, path: string, hrDuration: [number, number]): void {
+    private trackRequestMetrics(
+        method: string,
+        path: string,
+        hrDuration: [number, number],
+    ): void {
         const durationMs = hrDuration[0] * 1000 + hrDuration[1] / 1000000;
         const key = `${method}:${path}`;
 

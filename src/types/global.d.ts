@@ -1,4 +1,3 @@
-
 // Array Prototype Enhancements
 interface Array<T> {
     /**

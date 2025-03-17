@@ -8,23 +8,18 @@ import { RequestLoggerMiddleware } from './common/middlewares/request-logger.mid
  * Main application module
  */
 @Module({
-  imports: [
-    CommonModule.register(),
-    ...ModuleReflection(),
-  ],
-  controllers: [],
-  providers: [],
+    imports: [CommonModule.register(), ...ModuleReflection()],
+    controllers: [],
+    providers: [],
 })
 export class AppModule implements NestModule {
-  constructor(private readonly rateLimitService: RateLimitService) {}
-  
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RequestLoggerMiddleware)
-      .forRoutes('*');
-    consumer
-      .apply(this.rateLimitService.getMiddleware())
-      .exclude('health')
-      .forRoutes('*');
-  }
+    constructor(private readonly rateLimitService: RateLimitService) {}
+
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+        consumer
+            .apply(this.rateLimitService.getMiddleware())
+            .exclude('health')
+            .forRoutes('*');
+    }
 }

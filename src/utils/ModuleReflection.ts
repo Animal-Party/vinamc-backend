@@ -1,8 +1,8 @@
-import { join } from "path";
-import { readdirSync, statSync } from "fs";
-import { Type, ConsoleLogger } from "@nestjs/common";
+import { join } from 'path';
+import { readdirSync, statSync } from 'fs';
+import { Type, ConsoleLogger } from '@nestjs/common';
 
-const defaultModulePath = join(__dirname, "..", "modules");
+const defaultModulePath = join(__dirname, '..', 'modules');
 
 /**
  * Dynamically loads NestJS modules from the modules directory
@@ -10,11 +10,11 @@ const defaultModulePath = join(__dirname, "..", "modules");
  * @returns Array of NestJS module classes
  */
 export default function ModuleReflection(
-    modulePath: string = defaultModulePath
+    modulePath: string = defaultModulePath,
 ): Type<any>[] {
     const logger = new ConsoleLogger({
-        context: "ModuleReflection",
-        prefix: "VinaMC"
+        context: 'ModuleReflection',
+        prefix: 'VinaMC',
     });
     const modules: Type<any>[] = [];
 
@@ -32,12 +32,14 @@ export default function ModuleReflection(
 function findModules(
     dirPath: string,
     modules: Type<any>[],
-    logger: ConsoleLogger
+    logger: ConsoleLogger,
 ): void {
     try {
         const entries = readdirSync(dirPath);
 
-        const moduleFile = entries.find(file => file.match(/\.module\.(ts|js)$/i));
+        const moduleFile = entries.find((file) =>
+            file.match(/\.module\.(ts|js)$/i),
+        );
         if (moduleFile) {
             try {
                 const modulePath = join(dirPath, moduleFile);
@@ -47,15 +49,18 @@ function findModules(
 
                 if (!moduleClass) {
                     const exportedValues = Object.values(moduleExport);
-                    moduleClass = exportedValues.find(value =>
-                        typeof value === 'function' ||
-                        (typeof value === 'object' && value !== null)
+                    moduleClass = exportedValues.find(
+                        (value) =>
+                            typeof value === 'function' ||
+                            (typeof value === 'object' && value !== null),
                     );
                 }
 
                 if (moduleClass) {
                     modules.push(moduleClass);
-                    logger.debug(`Loaded module ${moduleClass.name} from ${dirPath.replace(/\\/g, "/").split("/").pop()}`);
+                    logger.debug(
+                        `Loaded module ${moduleClass.name} from ${dirPath.replace(/\\/g, '/').split('/').pop()}`,
+                    );
                 } else {
                     logger.warn(`Could not find module class in ${modulePath}`);
                 }
@@ -64,7 +69,7 @@ function findModules(
             }
         }
 
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             const entryPath = join(dirPath, entry);
 
             try {

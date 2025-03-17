@@ -1,4 +1,4 @@
-export * from "./logger";
+export * from './logger';
 
 // #region Array prototype
 Array.prototype.getRandom = function <T>(): T | undefined {
@@ -18,24 +18,32 @@ Array.prototype.shuffle = function <T>(): Array<T> {
 
 //#region String prototype
 String.prototype.toTitle = function (): string {
-    if (!this) return "";
+    if (!this) return '';
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
 String.prototype.toCapitalize = function () {
-    return this.split(" ").map(word => word.toTitle()).join(" ");
+    return this.split(' ')
+        .map((word) => word.toTitle())
+        .join(' ');
 };
 
 String.prototype.trimIndent = function () {
     const lines = this.split('\n');
-    const indentLengths = lines.filter(line => line.trim().length > 0)
-        .map(line => (line.match(/^\s*/) || [''])[0].length);
+    const indentLengths = lines
+        .filter((line) => line.trim().length > 0)
+        .map((line) => (line.match(/^\s*/) || [''])[0].length);
     const minIndent = Math.min(...indentLengths);
-    return lines.map(line => line.slice(minIndent)).join('\n').trim();
+    return lines
+        .map((line) => line.slice(minIndent))
+        .join('\n')
+        .trim();
 };
 
-String.prototype.toCodeScript = function (type?: "elm" | "css" | "js" | "json") {
-    return `\`\`\`${type || ""}\n${this}\n\`\`\``;
+String.prototype.toCodeScript = function (
+    type?: 'elm' | 'css' | 'js' | 'json',
+) {
+    return `\`\`\`${type || ''}\n${this}\n\`\`\``;
 };
 
 String.prototype.toBold = function () {
@@ -55,7 +63,10 @@ String.prototype.toItalic = function () {
 //#region Number prototype
 Number.prototype.toSupperScript = function () {
     const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
-    return this.toString().split('').map(digit => superscripts[parseInt(digit)]).join('');
+    return this.toString()
+        .split('')
+        .map((digit) => superscripts[parseInt(digit)])
+        .join('');
 };
 
 //#endregion
