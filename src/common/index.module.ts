@@ -8,9 +8,16 @@ import { RateLimitModule } from "./modules/rate-limit.module";
 
 @Module({})
 export default class CommonModule {
-    static register(options?: RequestLoggerOptions): DynamicModule {
+    private static initialized = false;
+    private static moduleRef: DynamicModule;
 
-        return {
+    static register(options?: RequestLoggerOptions): DynamicModule {
+        if (this.initialized) {
+            return this.moduleRef;
+        }
+
+        this.initialized = true;
+        this.moduleRef = {
             module: CommonModule,
             imports: [
                 LoggerModule.register(options),
@@ -20,5 +27,7 @@ export default class CommonModule {
             providers: [RateLimitService, AppLoggerService],
             exports: [RateLimitService, AppLoggerService]
         };
+
+        return this.moduleRef;
     }
 }

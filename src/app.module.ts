@@ -1,15 +1,16 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { RequestLoggerMiddleware } from './common/middlewares/request-logger.middleware';
 import ModuleReflection from './utils/ModuleReflection';
 import { RateLimitService } from './common/services/rate-limit.service';
 import CommonModule from './common/index.module';
+import { RequestLoggerMiddleware } from './common/middlewares/request-logger.middleware';
 
-const modules = ModuleReflection();
-
+/**
+ * Main application module
+ */
 @Module({
   imports: [
     CommonModule.register(),
-    ...modules,
+    ...ModuleReflection(),
   ],
   controllers: [],
   providers: [],
