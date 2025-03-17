@@ -1,18 +1,23 @@
-import { Global, Module } from '@nestjs/common';
-import { AppLoggerService } from '../services/app-logger.service';
-import { RequestLoggerModule } from '../../middlewares/request-logger.module';
+import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
+import { RequestLoggerMiddleware } from '../middlewares/request-logger.middleware';
+import { RequestLoggerOptions } from '../../types/logger';
 
 @Global()
 @Module({
-  imports: [
-    RequestLoggerModule.register({
-      logHeaders: false,
-      logParams: true,
-      excludePaths: ['/health', '/favicon.ico', '/metrics'],
-      logBody: process.env.NODE_ENV !== 'production',
-    }),
-  ],
-  providers: [AppLoggerService],
-  exports: [AppLoggerService],
+  providers: [RequestLoggerMiddleware],
+  exports: [RequestLoggerMiddleware],
 })
-export class AppLoggerModule {}
+export class LoggerModule {
+  static register(options?: RequestLoggerOptions): DynamicModule {
+    const optionsProvider: Provider = {
+      provide: 'REQUEST_LOGGER_OPTIONS',
+      useValue: options || {},
+    };
+
+    return {
+      module: LoggerModule,
+      providers: [optionsProvider, RequestLoggerMiddleware],
+      exports: [RequestLoggerMiddleware],
+    };
+  }
+}

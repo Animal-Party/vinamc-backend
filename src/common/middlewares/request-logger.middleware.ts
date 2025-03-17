@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware, Logger, LoggerService, Optional, Inject } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import { RequestData, RequestLoggerOptions } from '../types/logger';
+import { RequestData, RequestLoggerOptions } from '../../types/logger';
 
 const defaultOptions: RequestLoggerOptions = {
     headerName: 'X-Request-ID',

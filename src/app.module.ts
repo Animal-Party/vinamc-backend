@@ -1,16 +1,14 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware';
-import { AppLoggerModule } from './common/modules/logger.module';
+import { RequestLoggerMiddleware } from './common/middlewares/request-logger.middleware';
 import ModuleReflection from './utils/ModuleReflection';
-import { RateLimitModule } from './middlewares/rate-limit.module';
-import { RateLimitService } from './middlewares/rate-limit.service';
+import { RateLimitService } from './common/services/rate-limit.service';
+import CommonModule from './common/index.module';
 
 const modules = ModuleReflection();
 
 @Module({
   imports: [
-    AppLoggerModule,
-    RateLimitModule,
+    CommonModule.register(),
     ...modules,
   ],
   controllers: [],
@@ -25,6 +23,7 @@ export class AppModule implements NestModule {
       .forRoutes('*');
     consumer
       .apply(this.rateLimitService.getMiddleware())
+      .exclude('health')
       .forRoutes('*');
   }
 }
