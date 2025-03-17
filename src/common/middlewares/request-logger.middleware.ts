@@ -72,7 +72,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     private shouldSkip(req: Request): boolean {
         const { excludePaths, excludePathRegex } = this.options;
 
-        if (excludePaths?.some(path => req.path.startsWith(path))) {
+        if (excludePaths?.some(path => req.path.startsWith(path) || req.originalUrl.startsWith(path))) {
             return true;
         }
 
