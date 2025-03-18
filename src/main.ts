@@ -9,6 +9,7 @@ import {
 import { AppLoggerService } from './common/services/app-logger.service';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import './types';
+import ApiKeyGuard from './common/guards/api-key.guard';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -24,6 +25,7 @@ async function bootstrap() {
     setupMiddleware(app);
     setupGlobalPipes(app);
     setupGracefulShutdown(app, logger);
+    setupGlobalGuards(app);
 
     const port = process.env.PORT || 3000;
     await app.listen(port);
@@ -48,6 +50,10 @@ function setupGlobalPipes(app: INestApplication) {
             forbidNonWhitelisted: true,
         }),
     );
+}
+
+function setupGlobalGuards(app: INestApplication) {
+    app.useGlobalGuards(new ApiKeyGuard());
 }
 
 function setupGracefulShutdown(

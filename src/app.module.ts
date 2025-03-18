@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, UseGuards } from '@nestjs/common';
 import ModuleReflection from './utils/ModuleReflection';
 import { RateLimitService } from './common/services/rate-limit.service';
 import CommonModule from './common/index.module';
