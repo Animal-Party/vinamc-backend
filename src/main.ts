@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
     ValidationPipe,
-    Logger,
     INestApplication,
     ConsoleLogger,
 } from '@nestjs/common';
@@ -10,6 +9,7 @@ import { AppLoggerService } from './common/services/app-logger.service';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import './types';
 import ApiKeyGuard from './common/guards/api-key.guard';
+import { config } from 'dotenv';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -26,6 +26,8 @@ async function bootstrap() {
     setupGlobalPipes(app);
     setupGracefulShutdown(app, logger);
     setupGlobalGuards(app);
+
+    setUpEnvironment();
 
     const port = process.env.PORT || 3000;
     await app.listen(port);
@@ -83,11 +85,8 @@ function setupGracefulShutdown(
     });
 }
 
-function getLogLevels() {
-    if (process.env.NODE_ENV === 'production') {
-        return ['log', 'warn', 'error'];
-    }
-    return ['error', 'warn', 'log', 'verbose', 'debug'];
+function setUpEnvironment() { 
+    if (process.env.NODE_ENV === 'development') config();
 }
 
 bootstrap();
