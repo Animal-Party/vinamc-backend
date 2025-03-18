@@ -187,9 +187,6 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     private logRequest(requestData: RequestData): void {
         const { requestId, method, originalUrl, ip, userAgent } = requestData;
 
-        const message = `[${requestId}] | ${method} ${originalUrl} - ${ip} - ${userAgent}`;
-        this.logger.log(message);
-
         if (
             (this.options.logParams ||
                 this.options.logHeaders ||
@@ -288,6 +285,6 @@ export class RequestLoggerMiddleware implements NestMiddleware {
             };
         });
 
-        this.logger.log('Request metrics (last minute):', metrics);
+        this.logger.verbose?.('Request metrics (last minute):', metrics);
     }
 }

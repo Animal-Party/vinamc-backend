@@ -1,0 +1,7 @@
+{
+    "app": {
+        "API_PREFIX": "/api",
+        "useLogger": true,
+        "useCors": true
+    }
+}

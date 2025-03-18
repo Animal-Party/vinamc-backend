@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { ModuleRef, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {
     ValidationPipe,
@@ -10,8 +10,11 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import './types';
 import ApiKeyGuard from './common/guards/api-key.guard';
 import { config } from 'dotenv';
+import AppConfig from './app.config';
 
 async function bootstrap() {
+    setUpEnvironment();
+    
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         bufferLogs: true,
         logger: new ConsoleLogger({
@@ -19,15 +22,19 @@ async function bootstrap() {
         }),
     });
 
-    const logger = app.get(AppLoggerService);
+    const moduleRef = app.get(ModuleRef);
+    const logger = moduleRef.get(AppLoggerService, { strict: false });
     logger.initPerformanceMonitoring();
 
-    setupMiddleware(app);
+    if (AppConfig.app.useCors) {
+        setupMiddleware(app);
+    }
+    
     setupGlobalPipes(app);
     setupGracefulShutdown(app, logger);
-    setupGlobalGuards(app);
+    setupGlobalGuards(app, moduleRef);
 
-    setUpEnvironment();
+    app.setGlobalPrefix(AppConfig.app.API_PREFIX);
 
     const port = process.env.PORT || 3000;
     await app.listen(port);
@@ -54,8 +61,9 @@ function setupGlobalPipes(app: INestApplication) {
     );
 }
 
-function setupGlobalGuards(app: INestApplication) {
-    app.useGlobalGuards(new ApiKeyGuard());
+function setupGlobalGuards(app: INestApplication, moduleRef: ModuleRef) {
+    const apiKeyGuard = moduleRef.get(ApiKeyGuard, { strict: false });
+    app.useGlobalGuards(apiKeyGuard);
 }
 
 function setupGracefulShutdown(
@@ -86,7 +94,9 @@ function setupGracefulShutdown(
 }
 
 function setUpEnvironment() { 
-    if (process.env.NODE_ENV === 'development') config();
+    // Load environment variables from .env file in all environments 
+    // but give precedence to system environment variables
+    config();
 }
 
 bootstrap();

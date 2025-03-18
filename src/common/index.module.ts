@@ -1,4 +1,4 @@
-import { DynamicModule, Module, UseGuards } from '@nestjs/common';
+import { DynamicModule, Module, ForwardReference, forwardRef } from '@nestjs/common';
 import { RequestLoggerOptions } from 'src/types';
 import { LoggerModule } from './modules/logger.module';
 import { RateLimitService } from './services/rate-limit.service';
@@ -25,8 +25,17 @@ export default class CommonModule {
                 AppLoggerModule,
                 RateLimitModule,
             ],
-            providers: [RateLimitService, AppLoggerService, ApiKeyGuard],
-            exports: [RateLimitService, AppLoggerService, ApiKeyGuard],
+            providers: [
+                RateLimitService, 
+                AppLoggerService, 
+                ApiKeyGuard,
+            ],
+            exports: [
+                RateLimitService, 
+                AppLoggerService, 
+                ApiKeyGuard, 
+                AppLoggerModule,
+            ],
         };
 
         return this.moduleRef;
